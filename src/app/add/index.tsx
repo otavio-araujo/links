@@ -5,6 +5,7 @@ import { useState } from "react"
 
 import { styles } from "./styles"
 import { colors } from "@/styles/colors"
+import { linkStorage } from "@/storage/link-storage"
 
 import { Categories } from "@/components/categories"
 import { Input } from "@/components/input"
@@ -15,19 +16,37 @@ export default function Add() {
   const [name, setName] = useState("")
   const [url, setUrl] = useState("")
 
-  function handleAdd() {
-    if (!category) {
-      return Alert.alert("Ooops!", "Você esqueceu de selecionar uma categoria")
-    }
+  async function handleAdd() {
+    try {
+      if (!category) {
+        return Alert.alert(
+          "Ooops!",
+          "Você esqueceu de selecionar uma categoria"
+        )
+      }
 
-    if (!name.trim()) {
-      return Alert.alert("Ooops!", "O campo nome não pode ficar em branco...")
-    }
+      if (!name.trim()) {
+        return Alert.alert("Ooops!", "O campo nome não pode ficar em branco...")
+      }
 
-    if (!url.trim()) {
-      return Alert.alert("Ooops!", "O campo URL é obrigatório...")
+      if (!url.trim()) {
+        return Alert.alert("Ooops!", "O campo URL é obrigatório...")
+      }
+
+      await linkStorage.save({
+        id: new Date().getTime().toString(),
+        name,
+        url,
+        category,
+      })
+
+      Alert.alert("Sucesso", "Novo link adicionado", [
+        { text: "Ok", onPress: () => router.back() },
+      ])
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível salavar o Link")
+      console.log(error)
     }
-    console.warn(category, name, url)
   }
 
   return (
@@ -45,7 +64,12 @@ export default function Add() {
 
       <View style={styles.form}>
         <Input placeholder="Nome" onChangeText={setName} autoCorrect={false} />
-        <Input placeholder="URL" onChangeText={setUrl} autoCorrect={false} />
+        <Input
+          placeholder="URL"
+          onChangeText={setUrl}
+          autoCorrect={false}
+          autoCapitalize="none"
+        />
         <Button title="Adicionar" onPress={handleAdd} />
       </View>
     </View>
