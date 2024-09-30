@@ -1,6 +1,7 @@
-import { View, Text, TouchableOpacity } from "react-native"
+import { View, Text, TouchableOpacity, Alert } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
 import { router } from "expo-router"
+import { useState } from "react"
 
 import { styles } from "./styles"
 import { colors } from "@/styles/colors"
@@ -10,6 +11,25 @@ import { Input } from "@/components/input"
 import { Button } from "@/components/button"
 
 export default function Add() {
+  const [category, setCategory] = useState("")
+  const [name, setName] = useState("")
+  const [url, setUrl] = useState("")
+
+  function handleAdd() {
+    if (!category) {
+      return Alert.alert("Ooops!", "Você esqueceu de selecionar uma categoria")
+    }
+
+    if (!name.trim()) {
+      return Alert.alert("Ooops!", "O campo nome não pode ficar em branco...")
+    }
+
+    if (!url.trim()) {
+      return Alert.alert("Ooops!", "O campo URL é obrigatório...")
+    }
+    console.warn(category, name, url)
+  }
+
   return (
     <View style={styles.contaier}>
       <View style={styles.header}>
@@ -21,12 +41,12 @@ export default function Add() {
       </View>
 
       <Text style={styles.label}>Selecione uma categoria</Text>
-      <Categories />
+      <Categories onChange={setCategory} selected={category} />
 
       <View style={styles.form}>
-        <Input placeholder="Nome" onChangeText={console.warn} />
-        <Input placeholder="Url" />
-        <Button title="Adicionar" />
+        <Input placeholder="Nome" onChangeText={setName} autoCorrect={false} />
+        <Input placeholder="URL" onChangeText={setUrl} autoCorrect={false} />
+        <Button title="Adicionar" onPress={handleAdd} />
       </View>
     </View>
   )
